@@ -8,6 +8,15 @@ using System.Linq;
 using System.Threading.Tasks;
 
 
+namespace SmartO_rder.Controllers
+{
+    [Authorize(Roles = "Administrator")]
+    [Route("admin")]
+    public class AdminController : Controller
+    {
+        private readonly ApplicationDbContext _context;
+
+
 
         public async Task<IActionResult> Dashboard()
             var storeMerchants = await _userManager.GetUsersInRoleAsync("StoreMerchant");
@@ -16,6 +25,7 @@ using System.Threading.Tasks;
             ViewBag.Stores = await _context.Stores.Include(s => s.Owner).ToListAsync();
             ViewBag.Cafes = await _context.Cafes.Include(c => c.Owner).ToListAsync();
             return View(allMerchants);
+
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
@@ -28,6 +38,19 @@ using System.Threading.Tasks;
 
         [HttpGet]
         [Route("dashboard")]
+
+        public async Task<IActionResult> Dashboard()
+        {
+            var storeMerchants = await _userManager.GetUsersInRoleAsync("StoreMerchant");
+            var cafeMerchants = await _userManager.GetUsersInRoleAsync("CafeMerchant");
+            var allMerchants = storeMerchants.Concat(cafeMerchants).ToList();
+            ViewBag.Stores = await _context.Stores.Include(s => s.Owner).ToListAsync();
+            ViewBag.Cafes = await _context.Cafes.Include(c => c.Owner).ToListAsync();
+            return View(allMerchants);
+        }
+
+        [HttpGet("add-merchant")]
+
         public IActionResult Dashboard()
         {
 
@@ -53,10 +76,12 @@ using System.Threading.Tasks;
         [HttpPost("add-merchant")]
         public async Task<IActionResult> AddMerchant(string email, string password, string role)
 
+
         public IActionResult AddMerchant() => View();
 
         [HttpPost("add-merchant")]
         public async Task<IActionResult> AddMerchant(string email, string password)
+
 
         {
             var user = new IdentityUser { UserName = email, Email = email };
@@ -66,9 +91,11 @@ using System.Threading.Tasks;
                 if (!await _roleManager.RoleExistsAsync(role))
                     await _roleManager.CreateAsync(new IdentityRole(role));
                 await _userManager.AddToRoleAsync(user, role);
+
                 if (!await _roleManager.RoleExistsAsync("Merchant"))
                     await _roleManager.CreateAsync(new IdentityRole("Merchant"));
                 await _userManager.AddToRoleAsync(user, "Merchant");
+
                 return RedirectToAction("Dashboard");
             }
             foreach (var e in result.Errors)
@@ -81,7 +108,9 @@ using System.Threading.Tasks;
         public IActionResult CreateStore()
         {
             ViewBag.Merchants = _userManager.GetUsersInRoleAsync("StoreMerchant").Result;
+
             ViewBag.Merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
+
             return View();
         }
 
@@ -95,7 +124,9 @@ using System.Threading.Tasks;
                 return RedirectToAction("Dashboard");
             }
             ViewBag.Merchants = _userManager.GetUsersInRoleAsync("StoreMerchant").Result;
+
             ViewBag.Merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
+
             return View(store);
         }
 
@@ -103,7 +134,9 @@ using System.Threading.Tasks;
         public IActionResult CreateCafe()
         {
             ViewBag.Merchants = _userManager.GetUsersInRoleAsync("CafeMerchant").Result;
+
             ViewBag.Merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
+
             return View();
         }
 
@@ -117,7 +150,9 @@ using System.Threading.Tasks;
                 return RedirectToAction("Dashboard");
             }
             ViewBag.Merchants = _userManager.GetUsersInRoleAsync("CafeMerchant").Result;
+
             ViewBag.Merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
+
             return View(cafe);
         }
     }

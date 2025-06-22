@@ -10,6 +10,9 @@ namespace SmartO_rder.Controllers
 
     [Authorize(Roles = "CafeMerchant,StoreMerchant")]
 
+
+    [Authorize(Roles = "CafeMerchant,StoreMerchant")]
+
     [Authorize(Roles = "Merchant")]
 
     [Route("merchant")] 
