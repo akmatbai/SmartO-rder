@@ -1,0 +1,11 @@
+@model SmartO_rder.Models.Store
+<h2>@Model.Name</h2>
+<ul>
+@foreach (var p in Model.Products)
+{
+    <li>
+        @p.Name - @p.Price
+        <a asp-action="Buy" asp-route-slug="@Model.Slug" asp-route-article="@p.Article">Buy</a>
+    </li>
+}
+</ul>
