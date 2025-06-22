@@ -17,7 +17,9 @@ Both systems share the same data context and use Entity Framework Core with Iden
 
 - **Merchants** can manage their own stores and cafés, add products with quantities, create tables and see orders in the `/merchant/dashboard` area.
 - **Administrators** manage user roles, create merchants, stores and cafés via `/admin/dashboard`.
-  Authentication pages are available at `/auth-PK`.
+  Authentication pages are available at `/auth-PK`. A default administrator
+  account is created on startup with login `chakylbekov` and password
+  `141221Ch!`.
 
 ## Development
 
