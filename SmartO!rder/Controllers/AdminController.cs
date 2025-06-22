@@ -5,16 +5,17 @@ using Microsoft.EntityFrameworkCore;
 using SmartO_rder.Data;
 using SmartO_rder.Models;
 using System.Linq;
+using System.Threading.Tasks;
 
 
 
-namespace SmartO_rder.Controllers
-{
-    [Authorize(Roles = "Administrator")]
-    [Route("admin")]
-    public class AdminController : Controller
-    {
-        private readonly ApplicationDbContext _context;
+        public async Task<IActionResult> Dashboard()
+            var storeMerchants = await _userManager.GetUsersInRoleAsync("StoreMerchant");
+            var cafeMerchants = await _userManager.GetUsersInRoleAsync("CafeMerchant");
+            var allMerchants = storeMerchants.Concat(cafeMerchants).ToList();
+            ViewBag.Stores = await _context.Stores.Include(s => s.Owner).ToListAsync();
+            ViewBag.Cafes = await _context.Cafes.Include(c => c.Owner).ToListAsync();
+            return View(allMerchants);
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 

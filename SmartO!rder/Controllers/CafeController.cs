@@ -37,7 +37,7 @@ namespace SmartO_rder.Controllers
         {
             var tableEntity = _context.Tables
                 .Include(t => t.Cafe)
-                .FirstOrDefault(t => t.Cafe!.Slug == slug && t.Number == table);
+                .FirstOrDefault(t => t.Cafe != null && t.Cafe.Slug == slug && t.Number == table);
             if (tableEntity == null)
                 return NotFound();
 
