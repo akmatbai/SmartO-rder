@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartO_rder.Data;
 using SmartO_rder.Models;
+using System.Linq;
+
+
 
 namespace SmartO_rder.Controllers
 {
@@ -26,22 +29,42 @@ namespace SmartO_rder.Controllers
         [Route("dashboard")]
         public IActionResult Dashboard()
         {
+
+            var storeMerchants = _userManager.GetUsersInRoleAsync("StoreMerchant").Result;
+            var cafeMerchants = _userManager.GetUsersInRoleAsync("CafeMerchant").Result;
+            var merchants = storeMerchants.Concat(cafeMerchants).ToList();
+
             var merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
+
             ViewBag.Stores = _context.Stores.Include(s => s.Owner).ToList();
             ViewBag.Cafes = _context.Cafes.Include(c => c.Owner).ToList();
             return View(merchants);
         }
 
         [HttpGet("add-merchant")]
+
+        public IActionResult AddMerchant()
+        {
+            ViewBag.Roles = new[] { "CafeMerchant", "StoreMerchant" };
+            return View();
+        }
+
+        [HttpPost("add-merchant")]
+        public async Task<IActionResult> AddMerchant(string email, string password, string role)
+
         public IActionResult AddMerchant() => View();
 
         [HttpPost("add-merchant")]
         public async Task<IActionResult> AddMerchant(string email, string password)
+
         {
             var user = new IdentityUser { UserName = email, Email = email };
             var result = await _userManager.CreateAsync(user, password);
             if (result.Succeeded)
             {
+                if (!await _roleManager.RoleExistsAsync(role))
+                    await _roleManager.CreateAsync(new IdentityRole(role));
+                await _userManager.AddToRoleAsync(user, role);
                 if (!await _roleManager.RoleExistsAsync("Merchant"))
                     await _roleManager.CreateAsync(new IdentityRole("Merchant"));
                 await _userManager.AddToRoleAsync(user, "Merchant");
@@ -49,12 +72,14 @@ namespace SmartO_rder.Controllers
             }
             foreach (var e in result.Errors)
                 ModelState.AddModelError(string.Empty, e.Description);
+            ViewBag.Roles = new[] { "CafeMerchant", "StoreMerchant" };
             return View();
         }
 
         [HttpGet("create-store")]
         public IActionResult CreateStore()
         {
+            ViewBag.Merchants = _userManager.GetUsersInRoleAsync("StoreMerchant").Result;
             ViewBag.Merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
             return View();
         }
@@ -68,6 +93,7 @@ namespace SmartO_rder.Controllers
                 _context.SaveChanges();
                 return RedirectToAction("Dashboard");
             }
+            ViewBag.Merchants = _userManager.GetUsersInRoleAsync("StoreMerchant").Result;
             ViewBag.Merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
             return View(store);
         }
@@ -75,6 +101,7 @@ namespace SmartO_rder.Controllers
         [HttpGet("create-cafe")]
         public IActionResult CreateCafe()
         {
+            ViewBag.Merchants = _userManager.GetUsersInRoleAsync("CafeMerchant").Result;
             ViewBag.Merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
             return View();
         }
@@ -88,6 +115,7 @@ namespace SmartO_rder.Controllers
                 _context.SaveChanges();
                 return RedirectToAction("Dashboard");
             }
+            ViewBag.Merchants = _userManager.GetUsersInRoleAsync("CafeMerchant").Result;
             ViewBag.Merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
             return View(cafe);
         }

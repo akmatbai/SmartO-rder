@@ -1,0 +1,11 @@
+@model IEnumerable<SmartO_rder.Models.Order>
+<h2>Ready Orders</h2>
+<ul>
+@foreach(var o in Model){
+    <li>@o.Product!.Name x @o.Quantity
+        <form method="post" asp-action="MarkServed" asp-route-id="@o.Id">
+            <button type="submit">Served</button>
+        </form>
+    </li>
+}
+</ul>
