@@ -15,7 +15,13 @@ namespace SmartO_rder.Models
         public IdentityUser? User { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+
         public bool IsReady { get; set; }
         public bool IsServed { get; set; }
+
+        public bool IsReady { get; set; }
+        public bool IsServed { get; set; }
+
+
     }
 }

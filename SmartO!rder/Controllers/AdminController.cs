@@ -7,6 +7,7 @@ using SmartO_rder.Models;
 using System.Linq;
 using System.Threading.Tasks;
 
+
 namespace SmartO_rder.Controllers
 {
     [Authorize(Roles = "Administrator")]
@@ -14,6 +15,17 @@ namespace SmartO_rder.Controllers
     public class AdminController : Controller
     {
         private readonly ApplicationDbContext _context;
+
+
+
+        public async Task<IActionResult> Dashboard()
+            var storeMerchants = await _userManager.GetUsersInRoleAsync("StoreMerchant");
+            var cafeMerchants = await _userManager.GetUsersInRoleAsync("CafeMerchant");
+            var allMerchants = storeMerchants.Concat(cafeMerchants).ToList();
+            ViewBag.Stores = await _context.Stores.Include(s => s.Owner).ToListAsync();
+            ViewBag.Cafes = await _context.Cafes.Include(c => c.Owner).ToListAsync();
+            return View(allMerchants);
+
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
@@ -26,6 +38,7 @@ namespace SmartO_rder.Controllers
 
         [HttpGet]
         [Route("dashboard")]
+
         public async Task<IActionResult> Dashboard()
         {
             var storeMerchants = await _userManager.GetUsersInRoleAsync("StoreMerchant");
@@ -37,6 +50,23 @@ namespace SmartO_rder.Controllers
         }
 
         [HttpGet("add-merchant")]
+
+        public IActionResult Dashboard()
+        {
+
+            var storeMerchants = _userManager.GetUsersInRoleAsync("StoreMerchant").Result;
+            var cafeMerchants = _userManager.GetUsersInRoleAsync("CafeMerchant").Result;
+            var merchants = storeMerchants.Concat(cafeMerchants).ToList();
+
+            var merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
+
+            ViewBag.Stores = _context.Stores.Include(s => s.Owner).ToList();
+            ViewBag.Cafes = _context.Cafes.Include(c => c.Owner).ToList();
+            return View(merchants);
+        }
+
+        [HttpGet("add-merchant")]
+
         public IActionResult AddMerchant()
         {
             ViewBag.Roles = new[] { "CafeMerchant", "StoreMerchant" };
@@ -45,6 +75,14 @@ namespace SmartO_rder.Controllers
 
         [HttpPost("add-merchant")]
         public async Task<IActionResult> AddMerchant(string email, string password, string role)
+
+
+        public IActionResult AddMerchant() => View();
+
+        [HttpPost("add-merchant")]
+        public async Task<IActionResult> AddMerchant(string email, string password)
+
+
         {
             var user = new IdentityUser { UserName = email, Email = email };
             var result = await _userManager.CreateAsync(user, password);
@@ -53,6 +91,11 @@ namespace SmartO_rder.Controllers
                 if (!await _roleManager.RoleExistsAsync(role))
                     await _roleManager.CreateAsync(new IdentityRole(role));
                 await _userManager.AddToRoleAsync(user, role);
+
+                if (!await _roleManager.RoleExistsAsync("Merchant"))
+                    await _roleManager.CreateAsync(new IdentityRole("Merchant"));
+                await _userManager.AddToRoleAsync(user, "Merchant");
+
                 return RedirectToAction("Dashboard");
             }
             foreach (var e in result.Errors)
@@ -65,6 +108,9 @@ namespace SmartO_rder.Controllers
         public IActionResult CreateStore()
         {
             ViewBag.Merchants = _userManager.GetUsersInRoleAsync("StoreMerchant").Result;
+
+            ViewBag.Merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
+
             return View();
         }
 
@@ -78,6 +124,9 @@ namespace SmartO_rder.Controllers
                 return RedirectToAction("Dashboard");
             }
             ViewBag.Merchants = _userManager.GetUsersInRoleAsync("StoreMerchant").Result;
+
+            ViewBag.Merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
+
             return View(store);
         }
 
@@ -85,6 +134,9 @@ namespace SmartO_rder.Controllers
         public IActionResult CreateCafe()
         {
             ViewBag.Merchants = _userManager.GetUsersInRoleAsync("CafeMerchant").Result;
+
+            ViewBag.Merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
+
             return View();
         }
 
@@ -98,6 +150,9 @@ namespace SmartO_rder.Controllers
                 return RedirectToAction("Dashboard");
             }
             ViewBag.Merchants = _userManager.GetUsersInRoleAsync("CafeMerchant").Result;
+
+            ViewBag.Merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
+
             return View(cafe);
         }
     }
