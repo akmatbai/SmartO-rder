@@ -16,11 +16,19 @@ namespace SmartO_rder
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            builder.Services
+                .AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                SeedRolesAndAdmin(services).GetAwaiter().GetResult();
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -47,6 +55,51 @@ namespace SmartO_rder
             app.MapRazorPages();
 
             app.Run();
+        }
+
+        private static async Task SeedRolesAndAdmin(IServiceProvider services)
+        {
+            var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+            string[] roles = new[]
+            {
+                "Administrator",
+                "CafeMerchant",
+                "StoreMerchant",
+                "Accountant",
+                "StoreOperator",
+                "CafeOperator",
+                "Waiter",
+                "Cook"
+            };
+
+            foreach (var r in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(r))
+                    await roleManager.CreateAsync(new IdentityRole(r));
+            }
+
+            const string role = "Administrator";
+            const string username = "chakylbekov";
+            const string password = "141221Ch!";
+
+            if (!await roleManager.RoleExistsAsync(role))
+            {
+                await roleManager.CreateAsync(new IdentityRole(role));
+            }
+
+            var user = await userManager.FindByNameAsync(username);
+            if (user == null)
+            {
+                user = new IdentityUser { UserName = username, Email = "chakylbekov@example.com", EmailConfirmed = true };
+                await userManager.CreateAsync(user, password);
+            }
+
+            if (!await userManager.IsInRoleAsync(user, role))
+            {
+                await userManager.AddToRoleAsync(user, role);
+            }
         }
     }
 }
