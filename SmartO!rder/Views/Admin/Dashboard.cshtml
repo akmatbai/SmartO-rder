@@ -1,0 +1,15 @@
+@model IEnumerable<Microsoft.AspNetCore.Identity.IdentityUser>
+<h2>Admin Dashboard</h2>
+<h3>Merchants</h3>
+<ul>
+@foreach(var m in Model){<li>@m.Email</li>}
+</ul>
+<h3>Stores</h3>
+<ul>
+@foreach(var s in (IEnumerable<SmartO_rder.Models.Store>)ViewBag.Stores){<li>@s.Name (@s.Owner?.Email)</li>}
+</ul>
+<h3>Cafes</h3>
+<ul>
+@foreach(var c in (IEnumerable<SmartO_rder.Models.Cafe>)ViewBag.Cafes){<li>@c.Name (@c.Owner?.Email)</li>}
+</ul>
+<a asp-action="AddMerchant">Add Merchant</a> | <a asp-action="CreateStore">Create Store</a> | <a asp-action="CreateCafe">Create Cafe</a>
