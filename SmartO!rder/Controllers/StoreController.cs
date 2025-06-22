@@ -36,5 +36,34 @@ namespace SmartO_rder.Controllers
                 return NotFound();
             return View("Purchase", product);
         }
+// t5ywc2-codex/создать-онлайн-магазин-с-оплатой-по-артикулу-и-qr-меню
+
+        [HttpPost("buy/{article}")]
+        public IActionResult Buy(string slug, string article, int quantity)
+        {
+            var product = _context.Products
+                .Include(p => p.Store)
+                .FirstOrDefault(p => p.Store!.Slug == slug && p.Article == article);
+            if (product == null)
+                return NotFound();
+            if (quantity <= 0 || quantity > product.Quantity)
+            {
+                ModelState.AddModelError(string.Empty, "Invalid quantity");
+                return View("Purchase", product);
+            }
+
+            product.Quantity -= quantity;
+            var order = new Order
+            {
+                ProductId = product.Id,
+                Quantity = quantity,
+                UserId = User.Identity?.Name ?? "guest"
+            };
+            _context.Orders.Add(order);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index", new { slug });
+        }
+
     }
 }
