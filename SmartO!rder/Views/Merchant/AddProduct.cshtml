@@ -9,6 +9,8 @@
     <label>Article <input asp-for="Article" /></label><br />
     <label>Price <input asp-for="Price" /></label><br />
     <label>Quantity <input asp-for="Quantity" /></label><br />
+    <label>Category <input asp-for="Category" /></label><br />
+    <label>Image URL <input asp-for="ImageUrl" /></label><br />
     <label>Store
         <select asp-for="StoreId" asp-items="@(new SelectList(stores, "Id", "Name"))"></select>
     </label><br />
