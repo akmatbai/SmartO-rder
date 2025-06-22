@@ -1,0 +1,11 @@
+@model SmartO_rder.Models.Product
+<h2>Purchase @Model.Name</h2>
+<p>Article: @Model.Article</p>
+<p>Price: @Model.Price</p>
+<form asp-action="Buy" method="post" asp-route-slug="@Model.Store!.Slug" asp-route-article="@Model.Article">
+    <label>Quantity <input type="number" name="quantity" value="1" min="1" /></label><br />
+    <label><input type="radio" name="method" value="pickup" checked /> Pickup</label>
+    <label><input type="radio" name="method" value="delivery" /> Delivery</label><br />
+    <button type="submit">Pay</button>
+</form>
+<a asp-action="Index" asp-route-slug="@Model.Store!.Slug">Back to store</a>

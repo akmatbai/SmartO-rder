@@ -1,0 +1,14 @@
+@model SmartO_rder.Models.Cafe
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    var merchants = ViewBag.Merchants as IEnumerable<Microsoft.AspNetCore.Identity.IdentityUser>;
+}
+<h2>Create Cafe</h2>
+<form asp-action="CreateCafe" method="post">
+    <label>Name <input asp-for="Name" /></label><br />
+    <label>Slug <input asp-for="Slug" /></label><br />
+    <label>Owner
+        <select asp-for="OwnerId" asp-items="@(new SelectList(merchants, "Id", "Email"))"></select>
+    </label><br />
+    <button type="submit">Save</button>
+</form>
