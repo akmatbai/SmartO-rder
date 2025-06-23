@@ -1,0 +1,13 @@
+@model SmartO_rder.Models.Table
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    var cafes = ViewBag.Cafes as IEnumerable<SmartO_rder.Models.Cafe>;
+}
+<h2>Add Table</h2>
+<form asp-action="AddTable" method="post">
+    <label>Number <input asp-for="Number" /></label><br />
+    <label>Cafe
+        <select asp-for="CafeId" asp-items="@(new SelectList(cafes, "Id", "Name"))"></select>
+    </label><br />
+    <button type="submit">Save</button>
+</form>

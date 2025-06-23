@@ -1,0 +1,11 @@
+@model IEnumerable<SmartO_rder.Models.Table>
+<h2>Waiter Calls</h2>
+<ul>
+@foreach(var t in Model){
+    <li>@t.Cafe!.Name - Table @t.Number
+        <form method="post" asp-action="ConfirmCall" asp-route-id="@t.Id">
+            <button type="submit">Confirm</button>
+        </form>
+    </li>
+}
+</ul>
