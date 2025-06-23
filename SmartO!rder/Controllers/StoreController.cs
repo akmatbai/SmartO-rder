@@ -38,6 +38,7 @@ namespace SmartO_rder.Controllers
         }
 
 
+
 // t5ywc2-codex/создать-онлайн-магазин-с-оплатой-по-артикулу-и-qr-меню
 
 
@@ -67,6 +68,7 @@ namespace SmartO_rder.Controllers
 
             return RedirectToAction("Index", new { slug });
         }
+
 
     }
 }

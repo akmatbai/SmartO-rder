@@ -28,6 +28,7 @@ The application defines several roles used throughout the dashboards:
 - `Cook`
 
 
+
   - View products and initiate purchases by article number
 - **Cafés**
   - Access café menus by slug and table number: `/cafe/{slug}/menu/{table}`
@@ -43,10 +44,12 @@ Both systems share the same data context and use Entity Framework Core with Iden
   Authentication pages are available at `/auth-PK`. A default administrator
   account is created on startup with login `chakylbekov` and password
   `141221Ch!`.
+
   Authentication pages are available at `/auth-PK`. A default administrator
   account is created on startup with login `chakylbekov` and password
   `141221Ch!`.
   Authentication pages are available at `/auth-PK`.
+
 
 ## Development
 

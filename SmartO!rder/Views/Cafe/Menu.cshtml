@@ -2,14 +2,14 @@
 @{ var table = (SmartO_rder.Models.Table)ViewBag.Table; }
 <h2>Menu for table @table.Number</h2>
 <div style="position:fixed;top:0;width:100%;background:#eee;padding:5px;">
-
     @foreach (var cat in Model.Select(p => p.Category).Distinct())
     {
         <a href="#@cat">@cat</a>@: |
-
+    @foreach (var cat in Model.Select(p => p.Category).Distinct())
+    {
+        <a href="#@cat">@cat</a>@: |
     @foreach (var cat in Model.Select(p=>p.Category).Distinct()){
         <a href="#@cat">@cat</a> |
-
     }
 </div>
 <div style="position:fixed;bottom:10px;left:10px;">
@@ -31,7 +31,6 @@
 }
 </ul>
 </div>
-
 <form asp-action="CallWaiter" method="post" asp-route-slug="@table.Cafe!.Slug" asp-route-table="@table.Number">
     <button type="submit">Call Waiter</button>
 </form>
