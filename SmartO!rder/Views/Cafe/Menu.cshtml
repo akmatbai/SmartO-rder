@@ -5,6 +5,11 @@
     @foreach (var cat in Model.Select(p => p.Category).Distinct())
     {
         <a href="#@cat">@cat</a>@: |
+    @foreach (var cat in Model.Select(p => p.Category).Distinct())
+    {
+        <a href="#@cat">@cat</a>@: |
+    @foreach (var cat in Model.Select(p=>p.Category).Distinct()){
+        <a href="#@cat">@cat</a> |
     }
 </div>
 <div style="position:fixed;bottom:10px;left:10px;">
@@ -26,3 +31,14 @@
 }
 </ul>
 </div>
+<form asp-action="CallWaiter" method="post" asp-route-slug="@table.Cafe!.Slug" asp-route-table="@table.Number">
+    <button type="submit">Call Waiter</button>
+</form>
+<ul>
+@foreach (var p in Model)
+{
+    <li>@p.Name - @p.Price</li>
+}
+</ul>
+
+

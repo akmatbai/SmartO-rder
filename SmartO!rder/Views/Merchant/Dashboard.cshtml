@@ -4,6 +4,14 @@
 <tr><th>Product</th><th>Quantity</th><th>Date</th><th>Ready</th><th>Served</th></tr>
 @foreach(var o in Model){
 <tr><td>@o.Product!.Name</td><td>@o.Quantity</td><td>@o.CreatedAt</td><td>@o.IsReady</td><td>@o.IsServed</td></tr>
+
+
+
+<tr><th>Product</th><th>Quantity</th><th>Date</th></tr>
+@foreach(var o in Model){
+<tr><td>@o.Product!.Name</td><td>@o.Quantity</td><td>@o.CreatedAt</td></tr>
+
+
 }
 </table>
 <a asp-action="AddProduct">Add Product</a> | <a asp-action="AddTable">Add Table</a>

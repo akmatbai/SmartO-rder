@@ -16,5 +16,9 @@ namespace SmartO_rder.Data
         public DbSet<Cafe> Cafes { get; set; } = default!;
         public DbSet<Table> Tables { get; set; } = default!;
         public DbSet<Order> Orders { get; set; } = default!;
+
+
+        public DbSet<Order> Orders { get; set; } = default!;
+
     }
 }

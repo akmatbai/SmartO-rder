@@ -37,6 +37,11 @@ namespace SmartO_rder.Controllers
             return View("Purchase", product);
         }
 
+
+
+// t5ywc2-codex/создать-онлайн-магазин-с-оплатой-по-артикулу-и-qr-меню
+
+
         [HttpPost("buy/{article}")]
         public IActionResult Buy(string slug, string article, int quantity)
         {
@@ -63,5 +68,7 @@ namespace SmartO_rder.Controllers
 
             return RedirectToAction("Index", new { slug });
         }
+
+
     }
 }

@@ -7,7 +7,18 @@ using SmartO_rder.Models;
 
 namespace SmartO_rder.Controllers
 {
+ю
     [Authorize(Roles = "CafeMerchant,StoreMerchant")]
+
+
+    [Authorize(Roles = "CafeMerchant,StoreMerchant")]
+
+
+    [Authorize(Roles = "CafeMerchant,StoreMerchant")]
+
+    [Authorize(Roles = "Merchant")]
+
+
     [Route("merchant")] 
     public class MerchantController : Controller
     {
