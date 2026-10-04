@@ -1,7 +1,7 @@
 @model SmartO_rder.Models.Product
-@{ ViewData["Title"] = "Add product"; }
-<h2>Add product</h2>
-<form asp-action="AddProduct" method="post" style="max-width:480px">
+@{ ViewData["Title"] = "Edit product"; }
+<h2>Edit product</h2>
+<form asp-action="EditProduct" asp-route-id="@Model.Id" method="post" style="max-width:480px">
     <partial name="_ProductFields" model="Model" />
     <button type="submit" class="btn btn-primary">Save</button>
     <a asp-action="Products">Cancel</a>

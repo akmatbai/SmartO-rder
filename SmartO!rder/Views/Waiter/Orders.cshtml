@@ -1,11 +1,17 @@
-@model IEnumerable<SmartO_rder.Models.Order>
-<h2>Ready Orders</h2>
-<ul>
-@foreach(var o in Model){
-    <li>@o.Product!.Name x @o.Quantity
+@model IEnumerable<SmartO_rder.Models.CafeOrder>
+@section Head { <meta http-equiv="refresh" content="15" /> }
+@{ ViewData["Title"] = "Ready orders"; }
+<h2>Ready orders</h2>
+@if (!Model.Any()) { <p class="text-muted">Nothing to serve.</p> }
+@foreach (var o in Model)
+{
+    <div class="border rounded p-2 mb-2">
+        <strong>@o.Cafe!.Name — table @o.TableNumber</strong>
+        <ul class="mb-1">
+            @foreach (var i in o.Items) { <li>@i.Name × @i.Quantity</li> }
+        </ul>
         <form method="post" asp-action="MarkServed" asp-route-id="@o.Id">
-            <button type="submit">Served</button>
+            <button type="submit" class="btn btn-sm btn-success">Served</button>
         </form>
-    </li>
+    </div>
 }
-</ul>

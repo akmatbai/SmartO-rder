@@ -1,10 +1,15 @@
 @model IEnumerable<SmartO_rder.Models.Table>
-<h2>Waiter Calls</h2>
-<ul>
-@foreach(var t in Model){
-    <li>@t.Cafe!.Name - Table @t.Number
-        <form method="post" asp-action="ConfirmCall" asp-route-id="@t.Id">
-            <button type="submit">Confirm</button>
+@section Head { <meta http-equiv="refresh" content="15" /> }
+@{ ViewData["Title"] = "Waiter calls"; }
+<h2>Waiter calls</h2>
+@if (!Model.Any()) { <p class="text-muted">No calls.</p> }
+<ul class="list-unstyled">
+@foreach (var t in Model)
+{
+    <li class="mb-2">@t.Cafe!.Name — table @t.Number
+        <span class="text-muted">@t.WaiterCalledAt?.ToLocalTime().ToString("HH:mm")</span>
+        <form method="post" asp-action="ConfirmCall" asp-route-id="@t.Id" class="d-inline">
+            <button type="submit" class="btn btn-sm btn-primary">Confirm</button>
         </form>
     </li>
 }

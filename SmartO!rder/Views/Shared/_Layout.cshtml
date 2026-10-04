@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SmartO_rder.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Head", required: false)
 </head>
 <body>
     <header>
@@ -25,6 +26,23 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        @if (User.IsInRole("Administrator"))
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Dashboard">Admin</a></li>
+                        }
+                        @if (User.IsInRole("StoreMerchant") || User.IsInRole("CafeMerchant"))
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Merchant" asp-action="Dashboard">Merchant</a></li>
+                        }
+                        @if (User.IsInRole("Cook"))
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Cook" asp-action="Orders">Kitchen</a></li>
+                        }
+                        @if (User.IsInRole("Waiter"))
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Waiter" asp-action="Calls">Calls</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Waiter" asp-action="Orders">Ready orders</a></li>
+                        }
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

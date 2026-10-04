@@ -1,0 +1,12 @@
+@model SmartO_rder.Models.Order
+@{ ViewData["Title"] = "Payment"; }
+<h2>Payment</h2>
+<p>@Model.Product!.Name × @Model.Quantity = <strong>@Model.Total.ToString("0.00")</strong></p>
+@if (ViewBag.TestMode == true)
+{
+    <div class="alert alert-warning">Test mode: no money is charged. Connect a real payment provider before going live.</div>
+}
+<form asp-action="PayPost" method="post" asp-route-slug="@Model.Product.Store!.Slug" asp-route-id="@Model.PublicId">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <button type="submit" class="btn btn-success">Pay @Model.Total.ToString("0.00")</button>
+</form>

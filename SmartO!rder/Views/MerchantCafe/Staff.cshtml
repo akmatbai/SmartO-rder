@@ -1,0 +1,21 @@
+@model IEnumerable<SmartO_rder.Models.CafeStaff>
+@{
+    ViewData["Title"] = "Staff";
+    var roles = (Dictionary<string, string>)ViewBag.Roles;
+}
+<h2>Staff</h2>
+<p><a class="btn btn-primary" asp-action="AddStaff">Add employee</a> <a asp-controller="Merchant" asp-action="Dashboard">Back to dashboard</a></p>
+<table class="table table-sm align-middle">
+    <tr><th>Café</th><th>E-mail</th><th>Role</th><th></th></tr>
+    @foreach (var s in Model)
+    {
+        <tr>
+            <td>@s.Cafe!.Name</td><td>@s.User!.Email</td><td>@roles[s.UserId]</td>
+            <td>
+                <form method="post" asp-action="RemoveStaff" asp-route-id="@s.Id" class="d-inline" onsubmit="return confirm('Remove this employee?')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                </form>
+            </td>
+        </tr>
+    }
+</table>

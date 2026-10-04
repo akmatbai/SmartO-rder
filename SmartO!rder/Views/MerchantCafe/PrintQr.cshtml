@@ -1,0 +1,17 @@
+@model IEnumerable<SmartO_rder.Models.Table>
+@{
+    ViewData["Title"] = "QR codes";
+    var urls = (Dictionary<int, string>)ViewBag.Urls;
+}
+<h2 class="d-print-none">QR codes <button class="btn btn-sm btn-primary" onclick="window.print()">Print</button></h2>
+<div class="d-flex flex-wrap">
+    @foreach (var t in Model)
+    {
+        <div class="text-center border m-2 p-2" style="width:220px;break-inside:avoid">
+            <div><strong>@t.Cafe!.Name</strong></div>
+            <img src="@Url.Action("TableQr", new { id = t.Id })" alt="QR table @t.Number" style="width:200px;height:200px" />
+            <div>Table @t.Number</div>
+            <div class="small text-muted text-break">@urls[t.Id]</div>
+        </div>
+    }
+</div>

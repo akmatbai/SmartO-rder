@@ -16,6 +16,10 @@ namespace SmartO_rder.Data
         public DbSet<Cafe> Cafes { get; set; } = default!;
         public DbSet<Table> Tables { get; set; } = default!;
         public DbSet<Order> Orders { get; set; } = default!;
+        public DbSet<MenuItem> MenuItems { get; set; } = default!;
+        public DbSet<CafeOrder> CafeOrders { get; set; } = default!;
+        public DbSet<CafeOrderItem> CafeOrderItems { get; set; } = default!;
+        public DbSet<CafeStaff> CafeStaff { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -36,6 +40,27 @@ namespace SmartO_rder.Data
                 .HasForeignKey(o => o.UserId).OnDelete(DeleteBehavior.Restrict);
             builder.Entity<Order>().HasOne(o => o.Product).WithMany()
                 .HasForeignKey(o => o.ProductId).OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Order>().HasIndex(o => o.PublicId).IsUnique();
+            builder.Entity<Order>().Property(o => o.UnitPrice).HasPrecision(18, 2);
+
+            builder.Entity<MenuItem>().Property(m => m.Price).HasPrecision(18, 2);
+
+            builder.Entity<CafeOrder>().HasIndex(o => o.PublicId).IsUnique();
+            builder.Entity<CafeOrder>().HasOne(o => o.Cafe).WithMany()
+                .HasForeignKey(o => o.CafeId).OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<CafeOrder>().HasOne(o => o.Table).WithMany()
+                .HasForeignKey(o => o.TableId).OnDelete(DeleteBehavior.SetNull);
+            builder.Entity<CafeOrderItem>().HasOne(i => i.CafeOrder).WithMany(o => o.Items)
+                .HasForeignKey(i => i.CafeOrderId).OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<CafeOrderItem>().HasOne(i => i.MenuItem).WithMany()
+                .HasForeignKey(i => i.MenuItemId).OnDelete(DeleteBehavior.SetNull);
+            builder.Entity<CafeOrderItem>().Property(i => i.UnitPrice).HasPrecision(18, 2);
+
+            builder.Entity<CafeStaff>().HasIndex(s => new { s.UserId, s.CafeId }).IsUnique();
         }
+
+        // Cafés a Cook or Waiter is assigned to.
+        public IQueryable<int> CafeIdsForStaff(string userId) =>
+            CafeStaff.Where(s => s.UserId == userId).Select(s => s.CafeId);
     }
 }

@@ -1,0 +1,12 @@
+@model SmartO_rder.Models.Product
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{ var stores = ViewBag.Stores as IEnumerable<SmartO_rder.Models.Store>; }
+<div asp-validation-summary="All" class="text-danger"></div>
+<div class="mb-2"><label class="form-label">Name</label><input asp-for="Name" class="form-control" /></div>
+<div class="mb-2"><label class="form-label">Article</label><input asp-for="Article" class="form-control" /></div>
+<div class="mb-2"><label class="form-label">Price</label><input asp-for="Price" class="form-control" /></div>
+<div class="mb-2"><label class="form-label">Quantity in stock</label><input asp-for="Quantity" class="form-control" /></div>
+<div class="mb-2"><label class="form-label">Category</label><input asp-for="Category" class="form-control" /></div>
+<div class="mb-2"><label class="form-label">Image URL</label><input asp-for="ImageUrl" class="form-control" /></div>
+<div class="mb-2"><label class="form-label">Store</label>
+    <select asp-for="StoreId" asp-items="@(new SelectList(stores, "Id", "Name"))" class="form-select"></select></div>

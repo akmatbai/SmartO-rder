@@ -1,0 +1,19 @@
+@model SmartO_rder.Models.Order
+@using SmartO_rder.Models
+@{ ViewData["Title"] = "Order"; }
+<h2>Order @Model.PublicId.ToString()[..8]</h2>
+<p>@Model.Product!.Name × @Model.Quantity = <strong>@Model.Total.ToString("0.00")</strong></p>
+<p>Status: <strong>@Model.Status</strong></p>
+<p>
+    @if (Model.DeliveryMethod == DeliveryMethod.Delivery) { <text>Delivery to: @Model.Address</text> }
+    else { <text>Pickup at the store</text> }
+</p>
+@if (Model.PaymentReference != null)
+{
+    <p>Payment reference: @Model.PaymentReference</p>
+}
+@if (Model.Status == StoreOrderStatus.AwaitingPayment)
+{
+    <a class="btn btn-success" asp-action="Pay" asp-route-slug="@Model.Product.Store!.Slug" asp-route-id="@Model.PublicId">Pay</a>
+}
+<p class="mt-3"><a asp-action="Index" asp-route-slug="@Model.Product.Store!.Slug">Back to store</a></p>

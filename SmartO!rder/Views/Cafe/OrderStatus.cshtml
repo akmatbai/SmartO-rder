@@ -1,0 +1,15 @@
+@model SmartO_rder.Models.CafeOrder
+@using SmartO_rder.Models
+@section Head { @if (Model.Status != CafeOrderStatus.Served) { <meta http-equiv="refresh" content="20" /> } }
+@{ ViewData["Title"] = "Your order"; }
+<h2>Your order — table @Model.TableNumber</h2>
+<ul>
+@foreach (var i in Model.Items)
+{
+    <li>@i.Name × @i.Quantity = @((i.UnitPrice * i.Quantity).ToString("0.00"))</li>
+}
+</ul>
+<p>Total: <strong>@Model.Total.ToString("0.00")</strong></p>
+@if (Model.Comment != null) { <p>Comment: @Model.Comment</p> }
+<p>Status: <strong>@(Model.Status switch { CafeOrderStatus.New => "Being prepared", CafeOrderStatus.Ready => "Ready, on its way", _ => "Served" })</strong></p>
+<a asp-action="Menu" asp-route-slug="@Model.Cafe!.Slug" asp-route-table="@Model.TableNumber">Back to menu</a>
