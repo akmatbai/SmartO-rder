@@ -1,5 +1,6 @@
 <h2>Add Merchant</h2>
 <form asp-action="AddMerchant" method="post">
+    <div asp-validation-summary="All"></div>
     <label>Email <input type="email" name="email" /></label><br />
     <label>Password <input type="password" name="password" /></label><br />
     <label>Role

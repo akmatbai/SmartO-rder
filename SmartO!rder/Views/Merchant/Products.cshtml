@@ -1,0 +1,20 @@
+@model IEnumerable<SmartO_rder.Models.Product>
+@{ ViewData["Title"] = "Products"; }
+<h2>Products</h2>
+@if (TempData["Error"] is string error) { <div class="alert alert-danger">@error</div> }
+<p><a class="btn btn-primary" asp-action="AddProduct">Add product</a> <a asp-action="Dashboard">Back to dashboard</a></p>
+<table class="table table-sm align-middle">
+    <tr><th>Store</th><th>Name</th><th>Article</th><th>Price</th><th>Qty</th><th>Category</th><th></th></tr>
+    @foreach (var p in Model)
+    {
+        <tr>
+            <td>@p.Store!.Name</td><td>@p.Name</td><td>@p.Article</td><td>@p.Price.ToString("0.00")</td><td>@p.Quantity</td><td>@p.Category</td>
+            <td>
+                <a class="btn btn-sm btn-outline-primary" asp-action="EditProduct" asp-route-id="@p.Id">Edit</a>
+                <form method="post" asp-action="DeleteProduct" asp-route-id="@p.Id" class="d-inline" onsubmit="return confirm('Delete this product?')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+    }
+</table>

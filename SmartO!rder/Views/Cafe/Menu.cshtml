@@ -1,44 +1,86 @@
-@model IEnumerable<SmartO_rder.Models.Product>
-@{ var table = (SmartO_rder.Models.Table)ViewBag.Table; }
-<h2>Menu for table @table.Number</h2>
-<div style="position:fixed;top:0;width:100%;background:#eee;padding:5px;">
-    @foreach (var cat in Model.Select(p => p.Category).Distinct())
+@model IEnumerable<SmartO_rder.Models.MenuItem>
+@using System.Globalization
+@{
+    var table = (SmartO_rder.Models.Table)ViewBag.Table;
+    var categories = Model.GroupBy(m => string.IsNullOrEmpty(m.Category) ? "Other" : m.Category).ToList();
+    ViewData["Title"] = table.Cafe!.Name;
+}
+<h2>@table.Cafe.Name — table @table.Number</h2>
+
+@if (TempData["MenuMessage"] is string message) { <div class="alert alert-success">@message</div> }
+@if (TempData["MenuError"] is string error) { <div class="alert alert-danger">@error</div> }
+
+<nav class="mb-3">
+    @foreach (var group in categories)
     {
-        <a href="#@cat">@cat</a>@: |
-    @foreach (var cat in Model.Select(p => p.Category).Distinct())
-    {
-        <a href="#@cat">@cat</a>@: |
-    @foreach (var cat in Model.Select(p=>p.Category).Distinct()){
-        <a href="#@cat">@cat</a> |
+        <a class="me-2" href="#cat-@categories.IndexOf(group)">@group.Key</a>
     }
-</div>
-<div style="position:fixed;bottom:10px;left:10px;">
-    <form asp-action="CallWaiter" method="post" asp-route-slug="@table.Cafe!.Slug" asp-route-table="@table.Number">
-        <button type="submit">Call Waiter</button>
-    </form>
-</div>
-<div style="position:fixed;bottom:10px;right:10px;">
-    <a href="#cart">Cart</a>
-</div>
-<div style="margin-top:40px;">
-<ul>
-@foreach (var p in Model)
-{
-    <li id="@p.Category">
-        <img src="@p.ImageUrl" alt="@p.Name" style="width:50px;height:50px;" />
-        @p.Name - @p.Price
-    </li>
-}
-</ul>
-</div>
-<form asp-action="CallWaiter" method="post" asp-route-slug="@table.Cafe!.Slug" asp-route-table="@table.Number">
-    <button type="submit">Call Waiter</button>
+</nav>
+
+<form asp-action="CallWaiter" method="post" asp-route-slug="@table.Cafe.Slug" asp-route-table="@table.Number" class="mb-3">
+    <button type="submit" class="btn btn-outline-secondary">Call waiter</button>
 </form>
-<ul>
-@foreach (var p in Model)
+
+@if (!Model.Any())
 {
-    <li>@p.Name - @p.Price</li>
+    <p>The menu is empty for now.</p>
 }
-</ul>
+else
+{
+<form asp-action="PlaceOrder" method="post" asp-route-slug="@table.Cafe.Slug" asp-route-table="@table.Number" id="order-form">
+    @foreach (var group in categories)
+    {
+        <h4 id="cat-@categories.IndexOf(group)" class="mt-3">@group.Key</h4>
+        <ul class="list-unstyled">
+        @foreach (var m in group)
+        {
+            <li class="d-flex align-items-center mb-2">
+                @if (!string.IsNullOrEmpty(m.ImageUrl)) { <img src="@m.ImageUrl" alt="@m.Name" style="width:60px;height:60px;object-fit:cover;" class="me-2" /> }
+                <div class="flex-grow-1">
+                    <strong>@m.Name</strong> — @m.Price.ToString("0.00")
+                    @if (!string.IsNullOrEmpty(m.Description)) { <div class="text-muted small">@m.Description</div> }
+                </div>
+                <input type="number" name="items[@m.Id]" value="0" min="0" max="50" style="width:70px" class="form-control qty"
+                       data-name="@m.Name" data-price="@m.Price.ToString(CultureInfo.InvariantCulture)" />
+            </li>
+        }
+        </ul>
+    }
 
+    <div id="cart" class="border rounded p-3 mt-4">
+        <h4>Cart</h4>
+        <ul id="cart-lines"><li class="text-muted">Nothing selected yet</li></ul>
+        <p>Total: <strong id="cart-total">0.00</strong></p>
+        <div class="mb-2"><textarea name="comment" class="form-control" maxlength="300" placeholder="Comment for the kitchen"></textarea></div>
+        <button type="submit" class="btn btn-primary">Place order</button>
+    </div>
+</form>
+<a href="#cart" class="btn btn-primary" style="position:fixed;bottom:10px;right:10px;">Cart (<span id="cart-count">0</span>)</a>
+}
 
+@section Scripts {
+<script>
+(function () {
+    var inputs = document.querySelectorAll('.qty');
+    function render() {
+        var lines = document.getElementById('cart-lines');
+        if (!lines) return;
+        var total = 0, count = 0, html = '';
+        inputs.forEach(function (i) {
+            var q = parseInt(i.value, 10) || 0;
+            if (q <= 0) return;
+            var sum = q * parseFloat(i.dataset.price);
+            total += sum; count += q;
+            var li = document.createElement('li');
+            li.textContent = i.dataset.name + ' × ' + q + ' = ' + sum.toFixed(2);
+            html += li.outerHTML;
+        });
+        lines.innerHTML = html || '<li class="text-muted">Nothing selected yet</li>';
+        document.getElementById('cart-total').textContent = total.toFixed(2);
+        document.getElementById('cart-count').textContent = count;
+    }
+    inputs.forEach(function (i) { i.addEventListener('input', render); });
+    render();
+})();
+</script>
+}

@@ -5,6 +5,7 @@
 }
 <h2>Create Store</h2>
 <form asp-action="CreateStore" method="post">
+    <div asp-validation-summary="All"></div>
     <label>Name <input asp-for="Name" /></label><br />
     <label>Slug <input asp-for="Slug" /></label><br />
     <label>Owner

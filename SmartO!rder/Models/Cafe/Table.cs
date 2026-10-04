@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace SmartO_rder.Models
@@ -10,5 +11,6 @@ namespace SmartO_rder.Models
         public int CafeId { get; set; }
         public Cafe? Cafe { get; set; }
         public bool WaiterCalled { get; set; }
+        public DateTime? WaiterCalledAt { get; set; }
     }
 }

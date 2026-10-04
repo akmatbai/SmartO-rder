@@ -2,20 +2,19 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SmartO_rder.Models
 {
-    public class Product
+    public class MenuItem
     {
         public int Id { get; set; }
         [Required]
         public string Name { get; set; } = string.Empty;
-        [Required]
-        public string Article { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public string? Category { get; set; }
         [Range(0, double.MaxValue)]
         public decimal Price { get; set; }
-        [Range(0, int.MaxValue)]
-        public int Quantity { get; set; }
-        public string? Category { get; set; }
         public string? ImageUrl { get; set; }
-        public int StoreId { get; set; }
-        public Store? Store { get; set; }
+        public bool IsAvailable { get; set; } = true;
+
+        public int CafeId { get; set; }
+        public Cafe? Cafe { get; set; }
     }
 }

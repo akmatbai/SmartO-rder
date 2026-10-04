@@ -1,0 +1,29 @@
+@model IEnumerable<SmartO_rder.Models.Table>
+@{ ViewData["Title"] = "Tables"; }
+<h2>Tables &amp; QR codes</h2>
+<p>
+    <a class="btn btn-primary" asp-action="AddTable">Add table</a>
+    @foreach (var cafe in Model.Select(t => t.Cafe!).DistinctBy(c => c.Id))
+    {
+        <a class="btn btn-outline-secondary" asp-action="PrintQr" asp-route-cafeId="@cafe.Id">Print QR codes: @cafe.Name</a>
+    }
+    <a asp-controller="Merchant" asp-action="Dashboard">Back to dashboard</a>
+</p>
+<table class="table table-sm align-middle">
+    <tr><th>Café</th><th>Table</th><th>Menu link</th><th>QR</th><th></th></tr>
+    @foreach (var t in Model)
+    {
+        var url = Url.Action("Menu", "Cafe", new { slug = t.Cafe!.Slug, table = t.Number }, Context.Request.Scheme);
+        <tr>
+            <td>@t.Cafe.Name</td>
+            <td>@t.Number</td>
+            <td><a href="@url">@url</a></td>
+            <td><a asp-action="TableQr" asp-route-id="@t.Id"><img src="@Url.Action("TableQr", new { id = t.Id })" alt="QR table @t.Number" style="width:80px;height:80px" /></a></td>
+            <td>
+                <form method="post" asp-action="DeleteTable" asp-route-id="@t.Id" class="d-inline" onsubmit="return confirm('Delete this table?')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+    }
+</table>

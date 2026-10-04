@@ -1,11 +1,19 @@
-@model IEnumerable<SmartO_rder.Models.Order>
-<h2>Orders to Prepare</h2>
-<ul>
-@foreach(var o in Model){
-    <li>@o.Product!.Name x @o.Quantity
+@model IEnumerable<SmartO_rder.Models.CafeOrder>
+@section Head { <meta http-equiv="refresh" content="15" /> }
+@{ ViewData["Title"] = "Kitchen"; }
+<h2>Orders to prepare</h2>
+@if (!Model.Any()) { <p class="text-muted">No new orders.</p> }
+@foreach (var o in Model)
+{
+    <div class="border rounded p-2 mb-2">
+        <strong>@o.Cafe!.Name — table @o.TableNumber</strong>
+        <span class="text-muted">@o.CreatedAt.ToLocalTime().ToString("HH:mm")</span>
+        <ul class="mb-1">
+            @foreach (var i in o.Items) { <li>@i.Name × @i.Quantity</li> }
+        </ul>
+        @if (o.Comment != null) { <p class="mb-1"><em>@o.Comment</em></p> }
         <form method="post" asp-action="MarkReady" asp-route-id="@o.Id">
-            <button type="submit">Ready</button>
+            <button type="submit" class="btn btn-sm btn-success">Ready</button>
         </form>
-    </li>
+    </div>
 }
-</ul>

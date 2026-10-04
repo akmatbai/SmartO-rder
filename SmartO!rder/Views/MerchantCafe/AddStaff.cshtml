@@ -1,0 +1,18 @@
+@model SmartO_rder.Models.StaffForm
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Add employee";
+    var cafes = ViewBag.Cafes as IEnumerable<SmartO_rder.Models.Cafe>;
+}
+<h2>Add employee</h2>
+<form asp-action="AddStaff" method="post" style="max-width:480px">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="mb-2"><label class="form-label">E-mail (login)</label><input asp-for="Email" class="form-control" /></div>
+    <div class="mb-2"><label class="form-label">Password</label><input asp-for="Password" type="password" class="form-control" /></div>
+    <div class="mb-2"><label class="form-label">Role</label>
+        <select asp-for="Role" asp-items="@(new SelectList(SmartO_rder.Controllers.MerchantCafeController.StaffRoles))" class="form-select"></select></div>
+    <div class="mb-2"><label class="form-label">Café</label>
+        <select asp-for="CafeId" asp-items="@(new SelectList(cafes, "Id", "Name"))" class="form-select"></select></div>
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Staff">Cancel</a>
+</form>

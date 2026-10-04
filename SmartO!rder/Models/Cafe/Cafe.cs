@@ -16,5 +16,6 @@ namespace SmartO_rder.Models
         public IdentityUser? Owner { get; set; }
 
         public ICollection<Table> Tables { get; set; } = new List<Table>();
+        public ICollection<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
     }
 }

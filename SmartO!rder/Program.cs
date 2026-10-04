@@ -1,6 +1,11 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.WebEncoders;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 using Microsoft.EntityFrameworkCore;
 using SmartO_rder.Data;
+using SmartO_rder.Services;
 
 namespace SmartO_rder
 {
@@ -13,21 +18,27 @@ namespace SmartO_rder
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+                options.UseSqlite(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services
                 .AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddScoped<IPaymentService, TestPaymentService>();
+            // Output Cyrillic and other non-Latin text as-is instead of &#x...; entities (HTML special characters are still escaped).
+            builder.Services.Configure<WebEncoderOptions>(options =>
+                options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All));
+            builder.Services.AddControllersWithViews(options =>
+                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
 
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-                SeedRolesAndAdmin(services).GetAwaiter().GetResult();
+                services.GetRequiredService<ApplicationDbContext>().Database.Migrate();
+                SeedRolesAndAdmin(services, app.Configuration, app.Logger).GetAwaiter().GetResult();
             }
 
             // Configure the HTTP request pipeline.
@@ -57,7 +68,7 @@ namespace SmartO_rder
             app.Run();
         }
 
-        private static async Task SeedRolesAndAdmin(IServiceProvider services)
+        private static async Task SeedRolesAndAdmin(IServiceProvider services, IConfiguration configuration, ILogger logger)
         {
             var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
@@ -81,19 +92,29 @@ namespace SmartO_rder
             }
 
             const string role = "Administrator";
-            const string username = "chakylbekov";
-            const string password = "141221Ch!";
+            // Credentials come from configuration (user secrets / environment variables),
+            // e.g. SeedAdmin__Email and SeedAdmin__Password. The Identity login page signs in
+            // by e-mail, so the e-mail is also used as the user name.
+            var email = configuration["SeedAdmin:Email"];
+            var password = configuration["SeedAdmin:Password"];
 
-            if (!await roleManager.RoleExistsAsync(role))
-            {
-                await roleManager.CreateAsync(new IdentityRole(role));
-            }
-
-            var user = await userManager.FindByNameAsync(username);
+            var user = string.IsNullOrEmpty(email) ? null : await userManager.FindByNameAsync(email);
             if (user == null)
             {
-                user = new IdentityUser { UserName = username, Email = "chakylbekov@example.com", EmailConfirmed = true };
-                await userManager.CreateAsync(user, password);
+                if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+                {
+                    logger.LogWarning("SeedAdmin:Email/SeedAdmin:Password are not configured; skipping administrator seeding.");
+                    return;
+                }
+
+                user = new IdentityUser { UserName = email, Email = email, EmailConfirmed = true };
+                var result = await userManager.CreateAsync(user, password);
+                if (!result.Succeeded)
+                {
+                    logger.LogError("Failed to create seed administrator: {Errors}",
+                        string.Join("; ", result.Errors.Select(e => e.Description)));
+                    return;
+                }
             }
 
             if (!await userManager.IsInRoleAsync(user, role))

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartO_rder.Data;
 
@@ -10,9 +11,11 @@ using SmartO_rder.Data;
 namespace SmartO_rder.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261004093510_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.17");
@@ -241,186 +244,26 @@ namespace SmartO_rder.Data.Migrations
                     b.ToTable("Cafes");
                 });
 
-            modelBuilder.Entity("SmartO_rder.Models.CafeOrder", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("CafeId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Comment")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("PublicId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ReadyAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ServedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("TableId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("TableNumber")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CafeId");
-
-                    b.HasIndex("PublicId")
-                        .IsUnique();
-
-                    b.HasIndex("TableId");
-
-                    b.ToTable("CafeOrders");
-                });
-
-            modelBuilder.Entity("SmartO_rder.Models.CafeOrderItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("CafeOrderId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("MenuItemId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CafeOrderId");
-
-                    b.HasIndex("MenuItemId");
-
-                    b.ToTable("CafeOrderItems");
-                });
-
-            modelBuilder.Entity("SmartO_rder.Models.CafeStaff", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("CafeId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CafeId");
-
-                    b.HasIndex("UserId", "CafeId")
-                        .IsUnique();
-
-                    b.ToTable("CafeStaff");
-                });
-
-            modelBuilder.Entity("SmartO_rder.Models.MenuItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("CafeId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Category")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("Price")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CafeId");
-
-                    b.ToTable("MenuItems");
-                });
-
             modelBuilder.Entity("SmartO_rder.Models.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Address")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("CustomerName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("DeliveryMethod")
+                    b.Property<bool>("IsReady")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("PaidAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PaymentReference")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<bool>("IsServed")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("PublicId")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("INTEGER");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
                         .HasColumnType("TEXT");
@@ -428,9 +271,6 @@ namespace SmartO_rder.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
-
-                    b.HasIndex("PublicId")
-                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -518,9 +358,6 @@ namespace SmartO_rder.Data.Migrations
                     b.Property<bool>("WaiterCalled")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("WaiterCalledAt")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CafeId", "Number")
@@ -591,72 +428,6 @@ namespace SmartO_rder.Data.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("SmartO_rder.Models.CafeOrder", b =>
-                {
-                    b.HasOne("SmartO_rder.Models.Cafe", "Cafe")
-                        .WithMany()
-                        .HasForeignKey("CafeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("SmartO_rder.Models.Table", "Table")
-                        .WithMany()
-                        .HasForeignKey("TableId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Cafe");
-
-                    b.Navigation("Table");
-                });
-
-            modelBuilder.Entity("SmartO_rder.Models.CafeOrderItem", b =>
-                {
-                    b.HasOne("SmartO_rder.Models.CafeOrder", "CafeOrder")
-                        .WithMany("Items")
-                        .HasForeignKey("CafeOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SmartO_rder.Models.MenuItem", "MenuItem")
-                        .WithMany()
-                        .HasForeignKey("MenuItemId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("CafeOrder");
-
-                    b.Navigation("MenuItem");
-                });
-
-            modelBuilder.Entity("SmartO_rder.Models.CafeStaff", b =>
-                {
-                    b.HasOne("SmartO_rder.Models.Cafe", "Cafe")
-                        .WithMany()
-                        .HasForeignKey("CafeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Cafe");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("SmartO_rder.Models.MenuItem", b =>
-                {
-                    b.HasOne("SmartO_rder.Models.Cafe", "Cafe")
-                        .WithMany("MenuItems")
-                        .HasForeignKey("CafeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Cafe");
-                });
-
             modelBuilder.Entity("SmartO_rder.Models.Order", b =>
                 {
                     b.HasOne("SmartO_rder.Models.Product", "Product")
@@ -710,14 +481,7 @@ namespace SmartO_rder.Data.Migrations
 
             modelBuilder.Entity("SmartO_rder.Models.Cafe", b =>
                 {
-                    b.Navigation("MenuItems");
-
                     b.Navigation("Tables");
-                });
-
-            modelBuilder.Entity("SmartO_rder.Models.CafeOrder", b =>
-                {
-                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("SmartO_rder.Models.Store", b =>
