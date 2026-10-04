@@ -29,6 +29,23 @@ namespace SmartO_rder.Controllers
             return View(store);
         }
 
+        [HttpGet("find")]
+        public IActionResult Find(string slug, string? article)
+        {
+            article = article?.Trim();
+            if (string.IsNullOrEmpty(article))
+                return RedirectToAction("Index", new { slug });
+
+            var exists = _context.Products
+                .Any(p => p.Store!.Slug == slug && p.Article == article);
+            if (!exists)
+            {
+                TempData["SearchError"] = $"Product with article \"{article}\" not found";
+                return RedirectToAction("Index", new { slug });
+            }
+            return RedirectToAction("Buy", new { slug, article });
+        }
+
         [HttpGet("buy/{article}")]
         public IActionResult Buy(string slug, string article)
         {

@@ -1,9 +1,12 @@
 @model SmartO_rder.Models.Store
 <h2>@Model.Name</h2>
 
-<form asp-action="Buy" method="get">
-    <label>Article <input type="text" name="article" /></label>
-    <input type="hidden" name="slug" value="@Model.Slug" />
+@if (TempData["SearchError"] is string searchError)
+{
+    <p class="text-danger">@searchError</p>
+}
+<form asp-action="Find" asp-route-slug="@Model.Slug" method="get">
+    <label>Article <input type="text" name="article" required /></label>
     <button type="submit">Find</button>
 </form>
 
