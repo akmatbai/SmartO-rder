@@ -5,6 +5,7 @@
 }
 <h2>Add Product</h2>
 <form asp-action="AddProduct" method="post">
+    <div asp-validation-summary="All"></div>
     <label>Name <input asp-for="Name" /></label><br />
     <label>Article <input asp-for="Article" /></label><br />
     <label>Price <input asp-for="Price" /></label><br />

@@ -7,26 +7,15 @@ using SmartO_rder.Models;
 using System.Linq;
 using System.Threading.Tasks;
 
-
 namespace SmartO_rder.Controllers
 {
     [Authorize(Roles = "Administrator")]
     [Route("admin")]
     public class AdminController : Controller
     {
+        private static readonly string[] MerchantRoles = { "CafeMerchant", "StoreMerchant" };
+
         private readonly ApplicationDbContext _context;
-
-
-
-
-        public async Task<IActionResult> Dashboard()
-            var storeMerchants = await _userManager.GetUsersInRoleAsync("StoreMerchant");
-            var cafeMerchants = await _userManager.GetUsersInRoleAsync("CafeMerchant");
-            var allMerchants = storeMerchants.Concat(cafeMerchants).ToList();
-            ViewBag.Stores = await _context.Stores.Include(s => s.Owner).ToListAsync();
-            ViewBag.Cafes = await _context.Cafes.Include(c => c.Owner).ToListAsync();
-            return View(allMerchants);
-
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
@@ -37,9 +26,7 @@ namespace SmartO_rder.Controllers
             _roleManager = roleManager;
         }
 
-        [HttpGet]
-        [Route("dashboard")]
-
+        [HttpGet("dashboard")]
         public async Task<IActionResult> Dashboard()
         {
             var storeMerchants = await _userManager.GetUsersInRoleAsync("StoreMerchant");
@@ -51,118 +38,80 @@ namespace SmartO_rder.Controllers
         }
 
         [HttpGet("add-merchant")]
-
-
-        public IActionResult Dashboard()
-        {
-
-            var storeMerchants = _userManager.GetUsersInRoleAsync("StoreMerchant").Result;
-            var cafeMerchants = _userManager.GetUsersInRoleAsync("CafeMerchant").Result;
-            var merchants = storeMerchants.Concat(cafeMerchants).ToList();
-
-            var merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
-
-            ViewBag.Stores = _context.Stores.Include(s => s.Owner).ToList();
-            ViewBag.Cafes = _context.Cafes.Include(c => c.Owner).ToList();
-            return View(merchants);
-        }
-
-        [HttpGet("add-merchant")]
-
         public IActionResult AddMerchant()
         {
-            ViewBag.Roles = new[] { "CafeMerchant", "StoreMerchant" };
+            ViewBag.Roles = MerchantRoles;
             return View();
         }
 
         [HttpPost("add-merchant")]
         public async Task<IActionResult> AddMerchant(string email, string password, string role)
-
-
-
-        public IActionResult AddMerchant() => View();
-
-        [HttpPost("add-merchant")]
-        public async Task<IActionResult> AddMerchant(string email, string password)
-
-
         {
-            var user = new IdentityUser { UserName = email, Email = email };
-            var result = await _userManager.CreateAsync(user, password);
-            if (result.Succeeded)
+            if (!MerchantRoles.Contains(role))
+                ModelState.AddModelError(string.Empty, "Unknown role");
+
+            if (ModelState.IsValid)
             {
-                if (!await _roleManager.RoleExistsAsync(role))
-                    await _roleManager.CreateAsync(new IdentityRole(role));
-                await _userManager.AddToRoleAsync(user, role);
-
-
-                if (!await _roleManager.RoleExistsAsync("Merchant"))
-                    await _roleManager.CreateAsync(new IdentityRole("Merchant"));
-                await _userManager.AddToRoleAsync(user, "Merchant");
-
-                return RedirectToAction("Dashboard");
+                // Created by an administrator, so there is no confirmation e-mail to wait for.
+                var user = new IdentityUser { UserName = email, Email = email, EmailConfirmed = true };
+                var result = await _userManager.CreateAsync(user, password);
+                if (result.Succeeded)
+                {
+                    if (!await _roleManager.RoleExistsAsync(role))
+                        await _roleManager.CreateAsync(new IdentityRole(role));
+                    await _userManager.AddToRoleAsync(user, role);
+                    return RedirectToAction("Dashboard");
+                }
+                foreach (var e in result.Errors)
+                    ModelState.AddModelError(string.Empty, e.Description);
             }
-            foreach (var e in result.Errors)
-                ModelState.AddModelError(string.Empty, e.Description);
-            ViewBag.Roles = new[] { "CafeMerchant", "StoreMerchant" };
+            ViewBag.Roles = MerchantRoles;
             return View();
         }
 
         [HttpGet("create-store")]
-        public IActionResult CreateStore()
+        public async Task<IActionResult> CreateStore()
         {
-            ViewBag.Merchants = _userManager.GetUsersInRoleAsync("StoreMerchant").Result;
-
-
-            ViewBag.Merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
-
-
+            ViewBag.Merchants = await _userManager.GetUsersInRoleAsync("StoreMerchant");
             return View();
         }
 
         [HttpPost("create-store")]
-        public IActionResult CreateStore(Store store)
+        public async Task<IActionResult> CreateStore(Store store)
         {
+            if (await _context.Stores.AnyAsync(s => s.Slug == store.Slug))
+                ModelState.AddModelError(nameof(Store.Slug), "Slug is already taken");
+
             if (ModelState.IsValid)
             {
                 _context.Stores.Add(store);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return RedirectToAction("Dashboard");
             }
-            ViewBag.Merchants = _userManager.GetUsersInRoleAsync("StoreMerchant").Result;
-
-
-            ViewBag.Merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
-
-
+            ViewBag.Merchants = await _userManager.GetUsersInRoleAsync("StoreMerchant");
             return View(store);
         }
 
         [HttpGet("create-cafe")]
-        public IActionResult CreateCafe()
+        public async Task<IActionResult> CreateCafe()
         {
-            ViewBag.Merchants = _userManager.GetUsersInRoleAsync("CafeMerchant").Result;
-
-
-            ViewBag.Merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
-
+            ViewBag.Merchants = await _userManager.GetUsersInRoleAsync("CafeMerchant");
             return View();
         }
 
         [HttpPost("create-cafe")]
-        public IActionResult CreateCafe(Cafe cafe)
+        public async Task<IActionResult> CreateCafe(Cafe cafe)
         {
+            if (await _context.Cafes.AnyAsync(c => c.Slug == cafe.Slug))
+                ModelState.AddModelError(nameof(Cafe.Slug), "Slug is already taken");
+
             if (ModelState.IsValid)
             {
                 _context.Cafes.Add(cafe);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return RedirectToAction("Dashboard");
             }
-            ViewBag.Merchants = _userManager.GetUsersInRoleAsync("CafeMerchant").Result;
-
-
-            ViewBag.Merchants = _userManager.GetUsersInRoleAsync("Merchant").Result;
-
+            ViewBag.Merchants = await _userManager.GetUsersInRoleAsync("CafeMerchant");
             return View(cafe);
         }
     }

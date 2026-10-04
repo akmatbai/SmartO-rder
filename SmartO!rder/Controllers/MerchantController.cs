@@ -7,19 +7,8 @@ using SmartO_rder.Models;
 
 namespace SmartO_rder.Controllers
 {
-ю
     [Authorize(Roles = "CafeMerchant,StoreMerchant")]
-
-
-    [Authorize(Roles = "CafeMerchant,StoreMerchant")]
-
-
-    [Authorize(Roles = "CafeMerchant,StoreMerchant")]
-
-    [Authorize(Roles = "Merchant")]
-
-
-    [Route("merchant")] 
+    [Route("merchant")]
     public class MerchantController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -54,13 +43,18 @@ namespace SmartO_rder.Controllers
         [HttpPost("add-product")]
         public IActionResult AddProduct(Product product)
         {
+            var userId = _userManager.GetUserId(User)!;
+            if (!_context.Stores.Any(s => s.Id == product.StoreId && s.OwnerId == userId))
+                ModelState.AddModelError(nameof(Product.StoreId), "Store not found");
+            else if (_context.Products.Any(p => p.StoreId == product.StoreId && p.Article == product.Article))
+                ModelState.AddModelError(nameof(Product.Article), "Article already exists in this store");
+
             if (ModelState.IsValid)
             {
                 _context.Products.Add(product);
                 _context.SaveChanges();
                 return RedirectToAction("Dashboard");
             }
-            var userId = _userManager.GetUserId(User)!;
             ViewBag.Stores = _context.Stores.Where(s => s.OwnerId == userId).ToList();
             return View(product);
         }
@@ -76,13 +70,18 @@ namespace SmartO_rder.Controllers
         [HttpPost("add-table")]
         public IActionResult AddTable(Table table)
         {
+            var userId = _userManager.GetUserId(User)!;
+            if (!_context.Cafes.Any(c => c.Id == table.CafeId && c.OwnerId == userId))
+                ModelState.AddModelError(nameof(Table.CafeId), "Cafe not found");
+            else if (_context.Tables.Any(t => t.CafeId == table.CafeId && t.Number == table.Number))
+                ModelState.AddModelError(nameof(Table.Number), "Table number already exists");
+
             if (ModelState.IsValid)
             {
                 _context.Tables.Add(table);
                 _context.SaveChanges();
                 return RedirectToAction("Dashboard");
             }
-            var userId = _userManager.GetUserId(User)!;
             ViewBag.Cafes = _context.Cafes.Where(c => c.OwnerId == userId).ToList();
             return View(table);
         }

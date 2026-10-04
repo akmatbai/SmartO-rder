@@ -5,6 +5,7 @@
 }
 <h2>Add Table</h2>
 <form asp-action="AddTable" method="post">
+    <div asp-validation-summary="All"></div>
     <label>Number <input asp-for="Number" /></label><br />
     <label>Cafe
         <select asp-for="CafeId" asp-items="@(new SelectList(cafes, "Id", "Name"))"></select>

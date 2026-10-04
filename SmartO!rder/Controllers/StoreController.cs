@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartO_rder.Data;
@@ -9,10 +10,12 @@ namespace SmartO_rder.Controllers
     public class StoreController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public StoreController(ApplicationDbContext context)
+        public StoreController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -38,10 +41,6 @@ namespace SmartO_rder.Controllers
         }
 
 
-
-// t5ywc2-codex/создать-онлайн-магазин-с-оплатой-по-артикулу-и-qr-меню
-
-
         [HttpPost("buy/{article}")]
         public IActionResult Buy(string slug, string article, int quantity)
         {
@@ -61,14 +60,12 @@ namespace SmartO_rder.Controllers
             {
                 ProductId = product.Id,
                 Quantity = quantity,
-                UserId = User.Identity?.Name ?? "guest"
+                UserId = _userManager.GetUserId(User)
             };
             _context.Orders.Add(order);
             _context.SaveChanges();
 
             return RedirectToAction("Index", new { slug });
         }
-
-
     }
 }

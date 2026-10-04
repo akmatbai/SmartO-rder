@@ -27,34 +27,28 @@ The application defines several roles used throughout the dashboards:
 - `Waiter`
 - `Cook`
 
-
-
-  - View products and initiate purchases by article number
-- **Cafés**
-  - Access café menus by slug and table number: `/cafe/{slug}/menu/{table}`
-  - Guests can call a waiter from the menu page
-
-Both systems share the same data context and use Entity Framework Core with Identity for authentication.
-
-
 ### Administration
 
 - **Merchants** can manage their own stores and cafés, add products with quantities, create tables and see orders in the `/merchant/dashboard` area.
 - **Administrators** manage user roles, create merchants, stores and cafés via `/admin/dashboard`.
-  Authentication pages are available at `/auth-PK`. A default administrator
-  account is created on startup with login `chakylbekov` and password
-  `141221Ch!`.
-
-  Authentication pages are available at `/auth-PK`. A default administrator
-  account is created on startup with login `chakylbekov` and password
-  `141221Ch!`.
   Authentication pages are available at `/auth-PK`.
 
+On startup the application applies pending EF Core migrations and creates the roles. An administrator
+account is created only when its credentials are configured (user secrets or environment variables), e.g.:
+
+```bash
+cd "SmartO!rder"
+dotnet user-secrets set "SeedAdmin:UserName" "admin"
+dotnet user-secrets set "SeedAdmin:Password" "<strong password>"
+dotnet user-secrets set "SeedAdmin:Email" "admin@example.com"   # optional
+```
+
+or `SeedAdmin__UserName` / `SeedAdmin__Password` environment variables in production.
 
 ## Development
 
 1. Ensure [.NET 8 SDK](https://dotnet.microsoft.com/) is installed.
-2. Restore packages and run migrations if necessary.
+2. Configure the `SeedAdmin` credentials (see above). Migrations are applied automatically on startup.
 3. Start the application:
    ```bash
    dotnet run --project "SmartO!rder"

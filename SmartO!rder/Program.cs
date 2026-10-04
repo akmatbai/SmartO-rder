@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartO_rder.Data;
 
@@ -20,14 +21,16 @@ namespace SmartO_rder
                 .AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews(options =>
+                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
 
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-                SeedRolesAndAdmin(services).GetAwaiter().GetResult();
+                services.GetRequiredService<ApplicationDbContext>().Database.Migrate();
+                SeedRolesAndAdmin(services, app.Configuration, app.Logger).GetAwaiter().GetResult();
             }
 
             // Configure the HTTP request pipeline.
@@ -57,7 +60,7 @@ namespace SmartO_rder
             app.Run();
         }
 
-        private static async Task SeedRolesAndAdmin(IServiceProvider services)
+        private static async Task SeedRolesAndAdmin(IServiceProvider services, IConfiguration configuration, ILogger logger)
         {
             var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
@@ -81,19 +84,29 @@ namespace SmartO_rder
             }
 
             const string role = "Administrator";
-            const string username = "chakylbekov";
-            const string password = "141221Ch!";
+            // Credentials come from configuration (user secrets / environment variables),
+            // e.g. SeedAdmin__UserName and SeedAdmin__Password.
+            var username = configuration["SeedAdmin:UserName"];
+            var password = configuration["SeedAdmin:Password"];
+            var email = configuration["SeedAdmin:Email"] ?? $"{username}@example.com";
 
-            if (!await roleManager.RoleExistsAsync(role))
-            {
-                await roleManager.CreateAsync(new IdentityRole(role));
-            }
-
-            var user = await userManager.FindByNameAsync(username);
+            var user = string.IsNullOrEmpty(username) ? null : await userManager.FindByNameAsync(username);
             if (user == null)
             {
-                user = new IdentityUser { UserName = username, Email = "chakylbekov@example.com", EmailConfirmed = true };
-                await userManager.CreateAsync(user, password);
+                if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+                {
+                    logger.LogWarning("SeedAdmin:UserName/SeedAdmin:Password are not configured; skipping administrator seeding.");
+                    return;
+                }
+
+                user = new IdentityUser { UserName = username, Email = email, EmailConfirmed = true };
+                var result = await userManager.CreateAsync(user, password);
+                if (!result.Succeeded)
+                {
+                    logger.LogError("Failed to create seed administrator: {Errors}",
+                        string.Join("; ", result.Errors.Select(e => e.Description)));
+                    return;
+                }
             }
 
             if (!await userManager.IsInRoleAsync(user, role))
