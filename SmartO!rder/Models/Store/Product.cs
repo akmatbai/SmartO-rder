@@ -13,8 +13,8 @@ namespace SmartO_rder.Models
         public decimal Price { get; set; }
         [Range(0, int.MaxValue)]
         public int Quantity { get; set; }
-        public string Category { get; set; } = string.Empty;
-        public string ImageUrl { get; set; } = string.Empty;
+        public string? Category { get; set; }
+        public string? ImageUrl { get; set; }
         public int StoreId { get; set; }
         public Store? Store { get; set; }
     }

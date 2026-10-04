@@ -33,17 +33,17 @@ The application defines several roles used throughout the dashboards:
 - **Administrators** manage user roles, create merchants, stores and cafés via `/admin/dashboard`.
   Authentication pages are available at `/auth-PK`.
 
+Data is stored in a local SQLite file (`smartorder.db`, see `ConnectionStrings:DefaultConnection`).
 On startup the application applies pending EF Core migrations and creates the roles. An administrator
 account is created only when its credentials are configured (user secrets or environment variables), e.g.:
 
 ```bash
 cd "SmartO!rder"
-dotnet user-secrets set "SeedAdmin:UserName" "admin"
+dotnet user-secrets set "SeedAdmin:Email" "admin@example.com"
 dotnet user-secrets set "SeedAdmin:Password" "<strong password>"
-dotnet user-secrets set "SeedAdmin:Email" "admin@example.com"   # optional
 ```
 
-or `SeedAdmin__UserName` / `SeedAdmin__Password` environment variables in production.
+or `SeedAdmin__Email` / `SeedAdmin__Password` environment variables in production. Log in with that e-mail.
 
 ## Development
 

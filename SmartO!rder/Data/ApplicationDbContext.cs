@@ -27,8 +27,7 @@ namespace SmartO_rder.Data
             builder.Entity<Product>().HasIndex(p => new { p.StoreId, p.Article }).IsUnique();
             builder.Entity<Product>().Property(p => p.Price).HasPrecision(18, 2);
 
-            // Deleting a user must not silently wipe stores, cafés or order history;
-            // it also avoids SQL Server's "multiple cascade paths" error.
+            // Deleting a user or product must not silently wipe stores, cafés or order history.
             builder.Entity<Store>().HasOne(s => s.Owner).WithMany()
                 .HasForeignKey(s => s.OwnerId).OnDelete(DeleteBehavior.Restrict);
             builder.Entity<Cafe>().HasOne(c => c.Owner).WithMany()

@@ -14,7 +14,7 @@ namespace SmartO_rder
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+                options.UseSqlite(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services
@@ -85,21 +85,21 @@ namespace SmartO_rder
 
             const string role = "Administrator";
             // Credentials come from configuration (user secrets / environment variables),
-            // e.g. SeedAdmin__UserName and SeedAdmin__Password.
-            var username = configuration["SeedAdmin:UserName"];
+            // e.g. SeedAdmin__Email and SeedAdmin__Password. The Identity login page signs in
+            // by e-mail, so the e-mail is also used as the user name.
+            var email = configuration["SeedAdmin:Email"];
             var password = configuration["SeedAdmin:Password"];
-            var email = configuration["SeedAdmin:Email"] ?? $"{username}@example.com";
 
-            var user = string.IsNullOrEmpty(username) ? null : await userManager.FindByNameAsync(username);
+            var user = string.IsNullOrEmpty(email) ? null : await userManager.FindByNameAsync(email);
             if (user == null)
             {
-                if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+                if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                 {
-                    logger.LogWarning("SeedAdmin:UserName/SeedAdmin:Password are not configured; skipping administrator seeding.");
+                    logger.LogWarning("SeedAdmin:Email/SeedAdmin:Password are not configured; skipping administrator seeding.");
                     return;
                 }
 
-                user = new IdentityUser { UserName = username, Email = email, EmailConfirmed = true };
+                user = new IdentityUser { UserName = email, Email = email, EmailConfirmed = true };
                 var result = await userManager.CreateAsync(user, password);
                 if (!result.Succeeded)
                 {
